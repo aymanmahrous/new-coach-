@@ -1,0 +1,7 @@
+const URL=(import.meta.env.VITE_SUPABASE_URL??"").trim().replace(/\/$/,"");
+const KEY=(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY||import.meta.env.VITE_SUPABASE_ANON_KEY||"").trim();
+export async function startGoogleCalendarConnect(session:{accessToken:string}):Promise<{authorizationUrl:string}>{
+ const r=await fetch(`${URL}/functions/v1/google-calendar-oauth`,{method:"POST",headers:{apikey:KEY,Authorization:`Bearer ${session.accessToken}`,"Content-Type":"application/json"},body:JSON.stringify({mode:"authorize"}),cache:"no-store"});
+ const b=await r.json().catch(()=>({})); if(r.status===401||r.status===403)throw new Error("SESSION_EXPIRED"); if(!r.ok||!b.success||!b.authorizationUrl)throw new Error(String(b.code??"GOOGLE_CALENDAR_AUTHORIZE_FAILED")); return {authorizationUrl:String(b.authorizationUrl)};
+}
+export function googleCalendarConnectErrorMessage(code?:string){switch(code){case"NEEDS_CREDENTIAL":case"OAUTH_NOT_CONFIGURED":return"Google Calendar يحتاج إعداد OAuth داخلي مرة واحدة (Client ID + Client Secret + Redirect URI). لا تدخل أي Token.";case"STATE_INVALID_OR_EXPIRED":case"STATE_EXPIRED":return"انتهت جلسة ربط Google Calendar. اضغط اتصال مرة أخرى.";case"TOKEN_EXCHANGE_FAILED":return"تمت الموافقة من Google لكن تبادل OAuth لم يكتمل. نحتاج مراجعة إعدادات OAuth في Google Cloud.";case"REFRESH_TOKEN_MISSING":return"Google لم يعطِ Refresh Token. سيحتاج الربط إعادة تفويض بصلاحية offline.";default:return code?`تعذر ربط Google Calendar (${code}).`:"تعذر بدء ربط Google Calendar.";}}

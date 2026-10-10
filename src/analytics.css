@@ -1,0 +1,50 @@
+.analytics-trust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.analytics-trust.limited { border: 1px solid #fde68a; background: #fffbeb; color: #92400e; }
+.analytics-trust.ready { border: 1px solid #86efac; background: #f0fdf4; color: #166534; }
+.analytics-trust p { margin: 5px 0 0; color: inherit; }
+.analytics-trust > span { flex: 0 0 auto; border: 1px solid currentColor; border-radius: 999px; padding: 6px 10px; font-size: 0.75rem; }
+.analytics-groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 20px 0; }
+
+.analytics-groups > section {
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #dbe3ee;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fff, #f8fafc);
+}
+
+.analytics-groups section > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; color: #0891b2; }
+.analytics-groups h3 { margin: 3px 0 0; color: #0f172a; }
+.analytics-groups header p { margin: 0; font-size: 0.75rem; font-weight: 800; color: #64748b; }
+.analytics-metrics { display: grid; gap: 12px; }
+.analytics-metrics article { display: grid; gap: 5px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+.analytics-metrics span { color: #475569; font-size: 0.82rem; }
+.analytics-metrics strong { color: #0f172a; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+.analytics-metrics small { color: #64748b; line-height: 1.5; }
+.analytics-progress { width: 100%; height: 9px; overflow: hidden; border: 0; border-radius: 999px; background: #e2e8f0; appearance: none; }
+.analytics-progress::-webkit-progress-bar { border-radius: inherit; background: #e2e8f0; }
+.analytics-progress::-webkit-progress-value { border-radius: inherit; background: linear-gradient(90deg, #0891b2, #22d3ee); }
+.analytics-progress::-moz-progress-bar { border-radius: inherit; background: linear-gradient(90deg, #0891b2, #22d3ee); }
+.analytics-methodology { padding: 16px; border-radius: 14px; border: 1px solid #cbd5e1; background: #f8fafc; }
+.analytics-methodology p { margin: 6px 0; }
+.analytics-methodology small { color: #64748b; }
+
+@media (max-width: 1000px) {
+  .analytics-groups { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .analytics-trust { display: grid; }
+  .analytics-trust > span { justify-self: start; }
+}

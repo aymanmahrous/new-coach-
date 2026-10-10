@@ -1,0 +1,7 @@
+Corrective preview QA 2026-09-20:
+The preview authenticated successfully on commit ed0deef. The Content Studio now visibly shows a horizontal tab bar: Overview, Strategy, Generate, Content, Designs, Reels, Campaigns, Review, Connections. Coach Brain is visible in the header. Clicking Review changes the active tab and shows pipeline counts, batch selector, and actionable review cards. Clicking Generate changes the active tab and shows the 30-day calendar generation action.
+The browser extraction still reports many content cards below the active workspace; this needs investigation because the user explicitly requires no newspaper-like overflow. Do not merge until confirmed whether those cards are actually mounted/visible or only stale extraction output.
+Latest authenticated preview QA:
+- Overview tab shows only overview/audit/publish summary and no long content editor.
+- Generate tab shows only the 30-day calendar generation action; browser reports only 84 pixels below viewport and no content cards.
+- Content tab intentionally shows the detailed editor for 136 items, but this remains too long for the user’s requested organized marketing experience. Final corrective improvement: paginate the detailed editor (10 items per page) and add clear previous/next controls; keep search and status filters.

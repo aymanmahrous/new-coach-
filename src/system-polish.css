@@ -1,0 +1,26 @@
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid #22d3ee;
+  outline-offset: 3px;
+}
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  transform: translateY(-150%);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 900;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .2);
+}
+.skip-link:focus { transform: translateY(0); }
+.panel-heading-actions { display: flex; align-items: center; gap: 10px; }
+.push-install-bar { display: flex; align-items: center; gap: 10px; }
+.push-install-bar button { border: 0; background: transparent; color: #0f172a; font-weight: 800; font-size: .78rem; white-space: nowrap; cursor: pointer; padding: 6px 10px; border-radius: 10px; }
+.push-install-bar button:hover { background: #eef2f7; }
+.push-install-bar button:disabled { opacity: .55; cursor: not-allowed; }

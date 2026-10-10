@@ -1,0 +1,204 @@
+.archive-drive-manager {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border, #ddd);
+}
+
+.drive-manager {
+  display: grid;
+  gap: 16px;
+}
+
+.drive-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.drive-manager h3 {
+  margin: 4px 0;
+  font-size: 20px;
+}
+
+.drive-kicker {
+  font-size: 12px;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.drive-manager p {
+  opacity: 0.75;
+}
+
+.drive-primary,
+.drive-secondary,
+.drive-toolbar button,
+.drive-upload,
+.drive-dialog button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--surface, #fff);
+  cursor: pointer;
+}
+
+.drive-primary {
+  background: var(--foreground, #111);
+  color: var(--background, #fff);
+}
+
+.drive-manager-notice,
+.drive-message,
+.drive-dialog {
+  padding: 14px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  background: var(--surface, #fff);
+}
+
+.drive-manager-notice code {
+  display: block;
+  margin-top: 8px;
+}
+
+.drive-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.drive-toolbar strong {
+  margin-inline: auto;
+}
+
+.drive-upload {
+  position: relative;
+  overflow: hidden;
+}
+
+.drive-upload input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drive-dialog {
+  display: flex;
+  gap: 8px;
+}
+
+.drive-dialog input {
+  min-width: 240px;
+  flex: 1;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 9px;
+  padding: 9px;
+}
+
+.drive-list {
+  display: grid;
+  gap: 8px;
+}
+
+.drive-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  background: var(--surface, #fff);
+}
+
+.drive-item-main strong,
+.drive-item-main small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drive-item-main small {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 3px;
+}
+
+.drive-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.drive-actions button,
+.drive-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 8px;
+  padding: 7px;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.drive-actions .danger {
+  color: #b42318;
+}
+
+.drive-loading,
+.drive-empty {
+  text-align: center;
+  padding: 28px;
+  opacity: 0.7;
+}
+
+.spin {
+  animation: drive-spin 1s linear infinite;
+}
+
+@keyframes drive-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .drive-manager-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .drive-row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .drive-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .drive-toolbar strong {
+    margin-inline: 0;
+  }
+
+  .drive-dialog {
+    flex-wrap: wrap;
+  }
+
+  .drive-dialog input {
+    min-width: 0;
+    width: 100%;
+  }
+}
