@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Check, Copy, ExternalLink, Pencil, Sparkles as Spark, Trash2, Wand2, Send, Calendar, LayoutTemplate, Zap } from "lucide-react";
+import { Check, Copy, ExternalLink, Pencil, Sparkles as Spark, Trash2, Wand2, Send, Calendar, LayoutTemplate, Zap, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
 import { usePosts, type Platform, type Post } from "@/lib/posts";
+import { BrandedPosterStudio } from "./BrandedPosterStudio";
 
 type Lang = "ar" | "en";
 type Plan = "instant" | "daily" | "3days" | "week";
@@ -402,10 +403,9 @@ function EnhancedPostCard({
   const [templateType, setTemplateType] = useState<PostTemplate>(p.templateType || "drill");
   const [when, setWhen] = useState(p.scheduledAt || "");
   const [copied, setCopied] = useState(false);
-  const [briefCopied, setBriefCopied] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [designEngine, setDesignEngine] = useState<"canva" | "gemini">("canva");
-  const [geminiPromptCopied, setGeminiPromptCopied] = useState(false);
+  const [showStudio, setShowStudio] = useState(true);
+  const [verifyingPublish, setVerifyingPublish] = useState(false);
+  const [customLiveUrl, setCustomLiveUrl] = useState(p.publishedExternalUrl || "");
 
   const templateMeta = TEMPLATE_INFO[templateType] || TEMPLATE_INFO.drill;
 
@@ -413,82 +413,60 @@ function EnhancedPostCard({
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+    log(isAr ? "تم نسخ نص المنشور والهاشتاجات!" : "Caption copied!", "ok");
   };
 
-  const copyCanvaBrief = async () => {
-    const brief = `[Relax Fix UAE / Coach Ayman Canva Design Brief]
-Template Type: ${isAr ? templateMeta.labelAr : templateMeta.labelEn}
-Canvas Ratio: ${templateMeta.ratio} (${templateMeta.canvaType})
-Brand Colors: Deep Navy (#0F172A), Teal/Cyan (#06B6D4), Clean White (#FFFFFF)
-Post Caption / Content:
-${p.caption}
-
-Visual Concept:
-${p.visual || "Clean professional swimming academy graphics with high-contrast text and Coach Ayman branding"}`;
-
-    await navigator.clipboard.writeText(brief);
-    setBriefCopied(true);
-    setTimeout(() => setBriefCopied(false), 2000);
-    log(t.briefCopied, "ok");
-  };
-
-  const copyGeminiPrompt = async () => {
-    const prompt = `Create a photorealistic, high quality ${templateMeta.ratio} visual asset for Coach Ayman Swimming Academy Abu Dhabi.
-Content concept: ${p.caption}
-Visual specification: ${p.visual || "Abu Dhabi swimming pool training, crystal blue water, professional coaching atmosphere"}
-Colors: Deep Navy & Turquoise Cyan.`;
-    await navigator.clipboard.writeText(prompt);
-    setGeminiPromptCopied(true);
-    setTimeout(() => setGeminiPromptCopied(false), 2000);
-    log(isAr ? "تم نسخ برومبت تصميم Gemini!" : "Gemini prompt copied!", "ok");
-  };
-
-  const openGemini = () => {
-    window.open("https://gemini.google.com/app", "_blank", "noopener");
-  };
-
-  const openCanva = () => {
-    const url = "https://www.canva.com/";
-    window.open(url, "_blank", "noopener");
-  };
-
-  const handlePublishNow = async () => {
-    setPublishing(true);
-    log(isAr ? `جارٍ النشر المباشر على ${PLAT[p.platform]}…` : `Publishing to ${PLAT[p.platform]}…`, "info");
-
-    try {
-      // Direct call to Meta publish or Supabase transition
-      const response = await fetch("https://nmzxrjdxvmmzzmajrskm.supabase.co/functions/v1/safe-content-publisher", {
-        method: "POST",
-        headers: {
-          apikey: "sb_publishable_qXOPVaD5_f60qf1UbYrm2A_sH9c0lW5",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          channel: p.platform === "facebook" ? "facebook" : "instagram",
-          caption: p.caption,
-          contentItemId: p.id,
-        }),
-      }).catch(() => null);
-
-      const postUid = `1164107840123575_${Date.now()}`;
-      update(p.id, {
-        status: "Published",
-        publishedExternalId: postUid,
-        publishedExternalUrl: `https://www.facebook.com/1164107840123575`,
-      });
-
-      log(
-        isAr
-          ? `تم النشر بنجاح على صفحة فيسبوك/إنستغرام! (Post ID: ${postUid.slice(0, 15)}…)`
-          : `Published successfully! Post ID: ${postUid.slice(0, 15)}`,
-        "ok"
-      );
-    } catch (e) {
-      log(`${isAr ? "حدث خطأ أثناء النشر" : "Publishing error"}: ${(e as Error).message}`, "err");
-    } finally {
-      setPublishing(false);
+  const getPlatformDefaultUrl = (plat: Platform) => {
+    switch (plat) {
+      case "instagram":
+        return "https://www.instagram.com/RelaxFixUAE";
+      case "facebook":
+        return "https://www.facebook.com/1164107840123575";
+      case "tiktok":
+        return "https://www.tiktok.com/@RelaxFixUAE";
     }
+  };
+
+  const handleLaunchPublishBridge = async () => {
+    // 1. Copy caption + hashtags
+    await navigator.clipboard.writeText(p.caption);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+
+    // 2. Open destination composer
+    let composerUrl = "";
+    if (p.platform === "instagram") {
+      composerUrl = "https://business.facebook.com/latest/composer?context=instagram";
+    } else if (p.platform === "facebook") {
+      composerUrl = "https://www.facebook.com/1164107840123575";
+    } else {
+      composerUrl = "https://www.tiktok.com/creator-center/upload";
+    }
+
+    window.open(composerUrl, "_blank", "noopener");
+    setVerifyingPublish(true);
+
+    log(
+      isAr
+        ? `📋 تم نسخ النص والهاشتاجات وجارٍ فتح صفحة ${PLAT[p.platform]} للنشر المباشر!`
+        : `Copied caption & opened ${PLAT[p.platform]} composer!`,
+      "info"
+    );
+  };
+
+  const handleConfirmPublished = () => {
+    const finalUrl = customLiveUrl.trim() || getPlatformDefaultUrl(p.platform);
+    update(p.id, {
+      status: "Published",
+      publishedExternalUrl: finalUrl,
+    });
+    setVerifyingPublish(false);
+    log(
+      isAr
+        ? `✅ تم تأكيد اكتمال النشر على ${PLAT[p.platform]} بنجاح!`
+        : `Confirmed publication on ${PLAT[p.platform]}!`,
+      "ok"
+    );
   };
 
   return (
@@ -510,11 +488,22 @@ Colors: Deep Navy & Turquoise Cyan.`;
       </div>
 
       {/* Template Badge */}
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <LayoutTemplate className="size-3.5 text-accent" />
-        <span className="font-medium text-foreground">
-          {isAr ? templateMeta.labelAr : templateMeta.labelEn}
-        </span>
+      <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <LayoutTemplate className="size-3.5 text-accent" />
+          <span className="font-medium text-foreground">
+            {isAr ? templateMeta.labelAr : templateMeta.labelEn}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowStudio(!showStudio)}
+          className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 font-medium"
+        >
+          <ImageIcon className="size-3" />
+          {showStudio ? (isAr ? "إخفاء البوستر" : "Hide Poster") : (isAr ? "عرض البوستر والشعار" : "Show Poster")}
+        </button>
       </div>
 
       {editing ? (
@@ -588,91 +577,81 @@ Colors: Deep Navy & Turquoise Cyan.`;
         <>
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{p.caption}</p>
 
-          {p.visual && (
-            <div className="rounded-md bg-secondary/60 p-2.5 text-xs text-muted-foreground space-y-1">
-              <div className="font-semibold text-primary flex items-center gap-1">
-                🎨 {isAr ? "موجز التصميم وهوية القالب:" : "Canva Visual Brief:"}
-              </div>
-              <div>{p.visual}</div>
-            </div>
+          {/* Branded Poster & Visual Card Studio */}
+          {showStudio && (
+            <BrandedPosterStudio
+              id={p.id}
+              caption={p.caption}
+              visual={p.visual}
+              platform={p.platform}
+              templateType={templateType}
+              isAr={isAr}
+              log={log}
+            />
           )}
 
-          {/* Design Engine Switcher */}
-          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-secondary/60 border border-border w-fit text-[11px]">
-            <span className="text-muted-foreground px-1">{isAr ? "محرك التصميم:" : "Design Engine:"}</span>
-            <button
-              type="button"
-              onClick={() => setDesignEngine("canva")}
-              className={`px-2.5 py-0.5 rounded font-medium transition ${
-                designEngine === "canva"
-                  ? "bg-[#7D2AE8] text-white shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Canva
-            </button>
-            <button
-              type="button"
-              onClick={() => setDesignEngine("gemini")}
-              className={`px-2.5 py-0.5 rounded font-medium transition ${
-                designEngine === "gemini"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Google Gemini AI
-            </button>
-          </div>
-
-          {/* Action Buttons based on selected engine */}
-          <div className="flex flex-wrap gap-2 text-xs pt-1">
+          {/* Quick Caption Copy Button */}
+          <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => copy(p.caption)}
-              className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary"
+              className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 text-xs hover:bg-secondary font-medium"
             >
               {copied ? <Check className="size-3 text-accent" /> : <Copy className="size-3" />}
               {copied ? t.copied : t.copy}
             </button>
-
-            {designEngine === "canva" ? (
-              <>
-                <button
-                  onClick={openCanva}
-                  className="flex items-center gap-1 rounded-md bg-[#7D2AE8]/20 border border-[#7D2AE8]/40 px-2.5 py-1.5 text-[#A855F7] hover:bg-[#7D2AE8]/30 font-medium"
-                >
-                  <ExternalLink className="size-3" />
-                  {t.canva}
-                </button>
-
-                <button
-                  onClick={copyCanvaBrief}
-                  className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary"
-                >
-                  {briefCopied ? <Check className="size-3 text-accent" /> : <Copy className="size-3" />}
-                  {briefCopied ? t.briefCopied : t.copyBrief}
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={openGemini}
-                  className="flex items-center gap-1 rounded-md bg-primary/20 border border-primary/40 px-2.5 py-1.5 text-primary hover:bg-primary/30 font-medium"
-                >
-                  <Spark className="size-3" />
-                  {isAr ? "فتح Google Gemini وتوليد الصورة" : "Open Gemini Image/Video"}
-                </button>
-
-                <button
-                  onClick={copyGeminiPrompt}
-                  className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary"
-                >
-                  {geminiPromptCopied ? <Check className="size-3 text-accent" /> : <Copy className="size-3" />}
-                  {geminiPromptCopied ? (isAr ? "تم نسخ البرومبت!" : "Prompt Copied!") : (isAr ? "نسخ برومبت Gemini" : "Copy Gemini Prompt")}
-                </button>
-              </>
-            )}
           </div>
         </>
+      )}
+
+      {/* Verification Box when publishing is initiated */}
+      {verifyingPublish && (
+        <div className="rounded-lg border border-accent/40 bg-accent/10 p-3 space-y-2 text-xs">
+          <div className="font-semibold text-accent flex items-center gap-1.5">
+            <span>🚀</span>
+            <span>
+              {isAr
+                ? `تم فتح ${PLAT[p.platform]} ونسخ المنشور. بعد لصق المنشور والضغط على نشر، أكد أدناه:`
+                : `${PLAT[p.platform]} composer opened with caption copied. Confirm below:`}
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] text-muted-foreground">
+              {isAr ? "رابط المنشور المباشر (اختياري):" : "Direct live post URL (optional):"}
+            </label>
+            <input
+              type="url"
+              value={customLiveUrl}
+              onChange={(e) => setCustomLiveUrl(e.target.value)}
+              placeholder={
+                p.platform === "instagram"
+                  ? "https://www.instagram.com/p/..."
+                  : p.platform === "facebook"
+                  ? "https://www.facebook.com/..."
+                  : "https://www.tiktok.com/@..."
+              }
+              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={handleConfirmPublished}
+              className="flex items-center gap-1 rounded-md bg-accent px-3 py-1.5 font-bold text-accent-foreground shadow"
+            >
+              <Check className="size-3.5" />
+              {isAr ? "تأكيد اكتمال النشر الفعلي" : "Confirm Published"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setVerifyingPublish(false)}
+              className="rounded-md border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+            >
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Bottom Scheduling & Publish Controls */}
@@ -707,13 +686,13 @@ Colors: Deep Navy & Turquoise Cyan.`;
                   <Check className="size-4" />
                   {t.approve}
                 </button>
+
                 <button
-                  onClick={handlePublishNow}
-                  disabled={publishing}
-                  className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground disabled:opacity-50 shadow-sm"
+                  onClick={handleLaunchPublishBridge}
+                  className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground shadow-sm"
                 >
-                  <Send className={`size-3.5 ${publishing ? "animate-spin" : ""}`} />
-                  {publishing ? t.publishing : t.publishNow}
+                  <Send className="size-3.5" />
+                  {isAr ? `نشر مباشر على ${PLAT[p.platform]}` : `Publish to ${PLAT[p.platform]}`}
                 </button>
               </>
             )}
@@ -721,22 +700,20 @@ Colors: Deep Navy & Turquoise Cyan.`;
             {(p.status === "Scheduled" || p.status === "Claimed") && (
               <>
                 <button
-                  onClick={handlePublishNow}
-                  disabled={publishing}
-                  className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground disabled:opacity-50"
+                  onClick={handleLaunchPublishBridge}
+                  className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground"
                 >
                   <Send className="size-3.5" />
-                  {publishing ? t.publishing : t.publishNow}
+                  {isAr ? `نشر مباشر على ${PLAT[p.platform]}` : `Publish to ${PLAT[p.platform]}`}
                 </button>
+
                 <button
-                  onClick={() => {
-                    update(p.id, { status: "Published" });
-                    log(`${t.markPub}: ${PLAT[p.platform]}`, "ok");
-                  }}
+                  onClick={() => setVerifyingPublish(true)}
                   className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-secondary"
                 >
                   {t.markPub}
                 </button>
+
                 <button
                   onClick={() => update(p.id, { status: "Needs Review" })}
                   className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
@@ -747,19 +724,36 @@ Colors: Deep Navy & Turquoise Cyan.`;
             )}
 
             {p.status === "Published" && (
-              <div className="flex items-center gap-2 text-xs text-accent font-medium">
-                <Check className="size-4" />
-                <span>منشور ومؤكد على المنصة</span>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-400 font-medium">
+                <Check className="size-4 text-emerald-400" />
+                <span>
+                  {isAr
+                    ? `منشور ومؤكد على ${PLAT[p.platform]}`
+                    : `Published & verified on ${PLAT[p.platform]}`}
+                </span>
                 {p.publishedExternalUrl && (
                   <a
                     href={p.publishedExternalUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-0.5 text-primary underline"
+                    className="flex items-center gap-1 text-cyan-300 underline hover:text-cyan-200 ms-1 font-semibold"
                   >
-                    رابط المنشور <ExternalLink className="size-3" />
+                    <span>
+                      {p.platform === "instagram"
+                        ? (isAr ? "مشاهدة على إنستغرام" : "View on Instagram")
+                        : p.platform === "facebook"
+                        ? (isAr ? "مشاهدة على فيسبوك" : "View on Facebook")
+                        : (isAr ? "مشاهدة على تيك توك" : "View on TikTok")}
+                    </span>
+                    <ExternalLink className="size-3" />
                   </a>
                 )}
+                <button
+                  onClick={() => update(p.id, { status: "Needs Review" })}
+                  className="text-[11px] text-muted-foreground hover:text-foreground underline ms-auto"
+                >
+                  {isAr ? "تعديل أو إعادة جدولة" : "Edit / Reschedule"}
+                </button>
               </div>
             )}
 
