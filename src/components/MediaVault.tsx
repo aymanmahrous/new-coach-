@@ -188,13 +188,22 @@ export function MediaVault({ lang, log }: MediaVaultProps) {
                 {isAr ? "تفويض حساب Canva (OAuth)" : "Authorize Canva"}
               </button>
               <a
-                href="https://www.canva.com/design/EAHVAAahmjU/view"
+                href="https://www.canva.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 rounded-md border border-[#7D2AE8]/40 px-2.5 py-1.5 text-xs font-medium text-[#A855F7] hover:bg-[#7D2AE8]/10"
               >
                 <ExternalLink className="size-3.5" />
-                {isAr ? "فتح القالب مباشرة" : "Open Template"}
+                {isAr ? "فتح Canva الرسمي" : "Open Canva"}
+              </a>
+              <a
+                href="https://www.canva.com/create/social-media/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-md border border-[#7D2AE8]/40 px-2.5 py-1.5 text-xs font-medium text-[#A855F7] hover:bg-[#7D2AE8]/10"
+              >
+                <ExternalLink className="size-3.5" />
+                {isAr ? "إنشاء تصميم جديد" : "Create Design"}
               </a>
               <button
                 onClick={() => copyTemplateId(canvaBrandTemplateId)}

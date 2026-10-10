@@ -448,7 +448,7 @@ Colors: Deep Navy & Turquoise Cyan.`;
   };
 
   const openCanva = () => {
-    const url = "https://www.canva.com/design/EAHVAAahmjU/view";
+    const url = "https://www.canva.com/";
     window.open(url, "_blank", "noopener");
   };
 
