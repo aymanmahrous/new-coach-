@@ -288,26 +288,48 @@ export function BrandedPosterStudio({
     }
   };
 
-  const copyBrief = async () => {
-    const briefText = `[Official Relax Fix UAE / Coach Ayman Visual Brief]
-Title / Hook: ${hook}
-Ratio: ${ratio} (${templateType})
-Brand Colors: Deep Navy (#020617, #082F49), Cyan Wave (#06B6D4, #38BDF8), Gold Accents (#F59E0B)
-Logo: Relax Fix UAE Swimming Academy - Coach Ayman Emblem
-Key Bullet Points:
-${keyPoints.map((k) => `• ${k}`).join("\n")}
-Branches: Al Mushrif, Al Falah, Khalifa City, Al Danah
-Booking CTA: WhatsApp 058 821 9130 (100% Free Initial Assessment)
-Strict Marketing Rule: ZERO numerical prices in public visuals.`;
+  const copyCanvaBrief = async () => {
+    const briefText = `[Canva Template Design Brief — Relax Fix UAE / Coach Ayman]
+Platform Format: ${platform} (${ratio})
+Style Type: ${templateType === "drill" ? "Technique Reel 9:16" : templateType === "transformation" ? "Transformation Story 4:5" : templateType === "branch_promo" ? "Square Ad 1:1" : "Social Graphic"}
+Headline / Hook: ${hook}
+Academy Brand Colors:
+- Deep Navy: #020617 / #082F49
+- Cyan / Turquoise: #06B6D4 / #38BDF8
+- Gold Accents: #F59E0B
+- Pure White: #FFFFFF
+Layout Elements:
+1. Top Emblem: Relax Fix UAE Swimming Academy Crest with Coach Ayman
+2. Center: Bold Arabic Headline (${hook})
+3. Body Points:
+${keyPoints.map((k) => `   - ${k}`).join("\n")}
+4. Abu Dhabi Branches: Al Mushrif, Al Falah, Khalifa City, Al Danah
+5. Official Booking CTA: WhatsApp 058 821 9130 (100% Free Initial Assessment)
+Strict Marketing Policy: ZERO numerical prices in public visuals.`;
 
     await navigator.clipboard.writeText(briefText);
     setCopiedBrief(true);
     setTimeout(() => setCopiedBrief(false), 2000);
-    log(isAr ? "تم نسخ موجز التصميم الكامل للحافظة!" : "Design brief copied!", "ok");
+    log(isAr ? "🎨 تم نسخ مواصفات وتصميم Canva للحافظة!" : "Canva design brief copied!", "ok");
+  };
+
+  const copyGeminiPrompt = async () => {
+    const promptText = `A cinematic 8k photorealistic commercial photograph for Coach Ayman Swimming Academy in Abu Dhabi.
+Scene: Professional swimming session in a sparkling, temperature-controlled indoor pool in Abu Dhabi.
+Subject: ${templateType === "transformation" ? "An Emirati child smiling with pure relief and confidence while gently floating in crystal blue water with a friendly certified swimming coach" : templateType === "drill" ? "A skilled swimmer performing a smooth freestyle stroke, head turned 90 degrees with shoulder rotation for breath, clean water splash" : "Joyful kids group (maximum 4 children) enjoying a safe swimming assessment with an expert coach"}.
+Atmosphere: Crystal clear azure water, radiant light reflections, premium aquatic center atmosphere, uplifting, highly trustworthy and safe.
+Aspect Ratio: ${ratio === "9:16" ? "9:16 vertical" : ratio === "4:5" ? "4:5 portrait" : "1:1 square"}.
+Color Grading: Deep navy blue water tones with luminous turquoise highlights, golden warm lighting.
+Style: Shot on Sony A1, 50mm f/1.4 GM lens, crisp water droplets, shallow depth of field, authentic emotional expression.`;
+
+    await navigator.clipboard.writeText(promptText);
+    setCopiedBrief(true);
+    setTimeout(() => setCopiedBrief(false), 2000);
+    log(isAr ? "✨ تم نسخ برومبت Google Gemini الواقعي للحافظة!" : "Gemini photorealistic prompt copied!", "ok");
   };
 
   const openCanvaTool = () => {
-    copyBrief();
+    copyCanvaBrief();
     let canvaUrl = "https://www.canva.com/create/instagram-posts/";
     if (ratio === "9:16") {
       canvaUrl = "https://www.canva.com/create/instagram-stories/";
@@ -322,7 +344,7 @@ Strict Marketing Rule: ZERO numerical prices in public visuals.`;
   };
 
   const openGeminiAi = () => {
-    copyBrief();
+    copyGeminiPrompt();
     window.open("https://gemini.google.com/app", "_blank", "noopener");
     log(
       isAr
@@ -435,20 +457,11 @@ Strict Marketing Rule: ZERO numerical prices in public visuals.`;
       <div className="flex flex-wrap items-center gap-2 text-xs pt-1">
         <button
           type="button"
-          onClick={copyBrief}
-          className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary text-muted-foreground hover:text-foreground"
-        >
-          {copiedBrief ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
-          <span>{copiedBrief ? (isAr ? "تم النسخ" : "Copied") : (isAr ? "نسخ مواصفات الهوية" : "Copy Brand Specs")}</span>
-        </button>
-
-        <button
-          type="button"
           onClick={openCanvaTool}
           className="flex items-center gap-1 rounded-md bg-[#7D2AE8]/20 border border-[#7D2AE8]/40 px-2.5 py-1.5 text-[#C084FC] hover:bg-[#7D2AE8]/30 font-medium"
         >
           <ExternalLink className="size-3" />
-          <span>{isAr ? "فتح أداة Canva للمقاس" : "Open Canva for Ratio"}</span>
+          <span>{isAr ? "🎨 فتح أداة Canva للمقاس" : "Open Canva for Ratio"}</span>
         </button>
 
         <button
@@ -457,7 +470,25 @@ Strict Marketing Rule: ZERO numerical prices in public visuals.`;
           className="flex items-center gap-1 rounded-md bg-cyan-500/20 border border-cyan-400/40 px-2.5 py-1.5 text-cyan-300 hover:bg-cyan-500/30 font-medium"
         >
           <Sparkles className="size-3" />
-          <span>{isAr ? "توليد صور واقعية في Gemini AI" : "Generate in Gemini AI"}</span>
+          <span>{isAr ? "✨ فتح Google Gemini للصورة" : "Open Gemini for Image"}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={copyCanvaBrief}
+          className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary text-muted-foreground hover:text-foreground"
+        >
+          {copiedBrief ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+          <span>{isAr ? "نسخ مواصفات Canva" : "Copy Canva Spec"}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={copyGeminiPrompt}
+          className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1.5 hover:bg-secondary text-muted-foreground hover:text-foreground"
+        >
+          {copiedBrief ? <Check className="size-3 text-emerald-400" /> : <Copy className="size-3" />}
+          <span>{isAr ? "نسخ برومبت Gemini" : "Copy Gemini Prompt"}</span>
         </button>
       </div>
     </div>
